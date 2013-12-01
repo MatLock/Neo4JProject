@@ -51,9 +51,6 @@ public class User {
 	public void setPhotos(List<Photo> photos) {
 		this.photos = photos;
 	}
-	public List<User> getFriends() {
-		return friends;
-	}
 	public void setFriends(List<User> friends) {
 		this.friends = friends;
 	}
@@ -155,12 +152,15 @@ public class User {
 		return photos;		
 	}
 	
-	public Traverser getFriends(final Node person){
+	public Iterable<Path> getFriends(){
+		GraphDatabaseService gdbs = GDBSConnector.openConnection();
+		Index<Node> nodeIndex = gdbs.index().forNodes("USERNAME_KEY");
+		Node myNode = nodeIndex.get("USERNAME_KEY", this.getUserName()).getSingle();
 		TraversalDescription td = Traversal.description();
 		td.relationships(RelationShip.KNOWS,Direction.OUTGOING);
 		td.evaluator(Evaluators.excludeStartPosition());
 		td.evaluator(Evaluators.toDepth(3));
-		return td.traverse(person);
+		return td.traverse(myNode);
 	}
        public static void main(String[] args) {
     	   Photo p1 = new Photo(1, "diego");
@@ -170,14 +170,11 @@ public class User {
     	   photos1.add(p2);
     	   User u2 = new User(null, null, 1, "fede");
     	   User u1= new User(null, null, 2, "fer");
-//    	   u2.saveUser();
-//    	   u1.saveUser();
-    	   u1.addFriend(u2.getUserName());
-//    	   u1.savePhoto(p1);
-    	   GraphDatabaseService gdbs = GDBSConnector.openConnection();
-    	   Index<Node> nodeIndex = gdbs.index().forNodes("USERNAME_KEY");
-    	   Node user = nodeIndex.get("USERNAME_KEY", u1.getUserName()).getSingle();
-    	   Iterable<Path> x = u1.getFriends(user);
+    	   //u2.saveUser();
+    	   //u1.saveUser();
+    	  // u1.addFriend(u2.getUserName());
+    	  // u1.savePhoto(p1);
+    	   Iterable<Path> x = u1.getFriends();
     	   ArrayList<Node> nodes = new ArrayList<Node>();
     	   for(Path each : x){
     		  nodes.add(each.endNode());

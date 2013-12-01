@@ -11,7 +11,6 @@ public class Photo {
 	private int id_Photo;
 	private String name;
 	
-
 	public int getId_Photo() {
 		return id_Photo;
 	}
